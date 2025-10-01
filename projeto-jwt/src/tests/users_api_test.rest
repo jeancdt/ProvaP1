@@ -53,3 +53,16 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQ
 ### Acesso à área admin (rota protegida, requer token de usuário com role "admin")
 GET {{baseURL}}/protected/admin
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGlmcnMuZWR1LmJyIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzU2MzMzMjU3LCJleHAiOjE3NTYzMzY4NTd9.qBvkYosO3o0CXpG6L_LhblWHaBa5e-OsznChx4IIods
+
+### Criar evento (somente admin)
+POST {{baseURL}}/protected/events
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGlmcnMuZWR1LmJyIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzU5MzQ3MTMzLCJleHAiOjE3NTkzNTA3MzN9.GGdOpVHz_v3PGoR952J0O8O5N_v_GKGf7sMRy7WJ1xs
+
+{
+  "title": "Evento Teste",
+  "description": "Descrição do evento teste",
+  "start_date": "2025-10-15 09:00:00",
+  "end_date": "2025-10-15 17:00:00",
+  "location": "Local do evento"
+}
