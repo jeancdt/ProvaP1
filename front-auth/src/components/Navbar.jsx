@@ -11,7 +11,6 @@ export default function Navbar() {
                 <ul className="nav-links">
                     <li><NavLink to="/" end className={({ isActive }) => isActive ?
                         "active" : ""}>Home</NavLink></li>
-                    <li><NavLink to="/about">About</NavLink></li>
                     <li><NavLink to="/events">Events</NavLink></li>
                     {!user && <li><NavLink to="/login">Login</NavLink></li>}
                     {user && (
