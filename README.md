@@ -1,87 +1,60 @@
 # Sistema de Voluntariado IFRS
 
-Prova P1
+Prova P1 - Desenvolvimento Web
 
-## 📋 Índice
+## Sobre o Projeto
 
-- [Visão Geral](#-visão-geral)
-- [Tecnologias](#-tecnologias)
-- [Pré-requisitos](#-pré-requisitos)
-- [Instalação](#-instalação)
-- [Configuração](#-configuração)
-- [Executando o Projeto](#-executando-o-projeto)
-- [Usuários de Teste](#-usuários-de-teste)
-- [API Endpoints](#-api-endpoints)
-- [Testes](#-testes)
-- [Arquitetura](#-arquitetura)
-- [Funcionalidades](#-funcionalidades)
+Sistema para gerenciar eventos. Foi desenvolvido usando Node.js no backend e React no frontend.
 
-## 🎯 Visão Geral
-
-Este projeto implementa um sistema básico de gerenciamento de eventos com:
-- Autenticação e autorização baseada em JWT
-- Controle de acesso por roles (admin/user)
-- Gerenciamento de eventos
+Principais funcionalidades:
+- Login com JWT
+- Controle de usuários (admin e user)
+- Cadastro e listagem de eventos
 - Arquitetura em camadas (Model-Service-Controller)
 
-## 🚀 Tecnologias
+## Tecnologias Utilizadas
 
-### Backend (`projeto-jwt/`)
-- **Node.js** + **Express**
-- **MySQL**
-- **JWT**
-- **Bcrypt**
-- **dotenv**
-- **Nodemon**
+**Backend:**
+- Node.js + Express
+- MySQL
+- JWT para autenticação
+- Bcrypt para criptografia de senhas
 
-### Frontend (`front-auth/`)
-- **React**
-- **Vite**
-- **React Router**
-- **Axios**
-- **Context API**
+**Frontend:**
+- React
+- Vite
+- React Router
+- Axios
 
-## ✅ Pré-requisitos
+## O que você precisa ter instalado
 
-Certifique-se de ter instalado:
-- **Node.js**
-- **npm** ou **yarn**
-- **MySQL**
-- **Git**
+- Node.js
+- MySQL
+- npm ou yarn
 
-## 📦 Instalação
+## Como rodar o projeto
 
-### 1. Clone o repositório
+### 1. Clone e instale as dependências
 
-```bash
-git clone <url-do-repositorio>
-```
-
-### 2. Instale as dependências do Backend
-
+Backend:
 ```bash
 cd projeto-jwt
 npm install
 ```
 
-### 3. Instale as dependências do Frontend
-
+Frontend:
 ```bash
-cd ../front-auth
+cd front-auth
 npm install
 ```
 
-## ⚙️ Configuração
+### 2. Configure o Banco de Dados
 
-### 1. Configure o Banco de Dados MySQL
+Abra o MySQL Workbench ou phpMyAdmin e execute o arquivo `projeto-jwt/db.sql`
 
-Abra o MySQL Workbench/phpMyAdmin e execute o conteúdo do arquivo `projeto-jwt/db.sql`.
+### 3. Configure o arquivo .env
 
-### 2. Configure as Variáveis de Ambiente do Backend
-
-Crie um arquivo `.env` na pasta `projeto-jwt/`:
-
-Adicione as seguintes variáveis:
+Crie um arquivo `.env` dentro da pasta `projeto-jwt/` com:
 
 ```env
 # Servidor
@@ -99,170 +72,79 @@ JWT_SECRET=sua_chave_secreta_jwt
 JWT_EXPIRES_IN=24h
 ```
 
-**Importante:** Altere as variáveis com seus próprios valores.
+### 4. Rodando a aplicação
 
-### 3. Configure a URL da API no Frontend
-
-No arquivo `front-auth/src/api/http.js`, verifique se a `baseURL` está correta:
-
-```javascript
-baseURL: 'http://localhost:3000'
-```
-
-## 🎮 Executando o Projeto
-
-### Backend
-
+Backend:
 ```bash
 cd projeto-jwt
 npm run dev
 ```
+Vai rodar em http://localhost:3000
 
-O servidor estará rodando em: **http://localhost:3000**
-
-### Frontend
-
-Em outro terminal:
-
+Frontend (abra outro terminal):
 ```bash
 cd front-auth
 npm run dev
 ```
+Vai rodar em http://localhost:5173
 
-A aplicação estará disponível em: **http://localhost:5173** (ou a porta exibida no terminal)
+## Usuários para testar
 
-## 👥 Usuários de Teste
+O banco já vem com 2 usuários:
 
-O banco de dados vem com dois usuários pré-cadastrados:
+- **Usuário comum:** usuario@ifrs.edu.br / 123456
+- **Admin:** admin@ifrs.edu.br / admin123
 
-| Email                  | Senha    | Role  | Permissões                |
-|------------------------|----------|-------|---------------------------|
-| usuario@ifrs.edu.br    | 123456   | user  | Visualizar eventos        |
-| admin@ifrs.edu.br      | admin123 | admin | Todas + Criar eventos     |
+## Principais Rotas da API
 
-## 🔌 API Endpoints
-
-### Autenticação
-
-```http
+**Login:**
+```
 POST /auth/login
-Content-Type: application/json
-
-{
-  "email": "admin@ifrs.edu.br",
-  "password": "123456"
-}
 ```
 
-**Resposta:**
-```json
-{
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "user": {
-    "email": "admin@ifrs.edu.br",
-    "role": "admin"
-  }
-}
+**Listar eventos (pública):**
+```
+GET /events
 ```
 
-### Rotas Públicas
-
-```http
-GET /events                    # Lista todos os eventos
+**Dashboard (precisa estar logado):**
+```
+GET /dashboard
 ```
 
-### Rotas Protegidas (Requer Token)
-
-```http
-GET /dashboard                 # Dashboard do usuário autenticado
-Authorization: Bearer {token}
+**Criar evento (só admin):**
+```
+POST /events
 ```
 
-### Rotas Admin (Requer Role Admin)
+Tem um arquivo `projeto-jwt/src/tests/users_api_test.rest` com exemplos de como testar as rotas.
 
-```http
-POST /events                   # Criar novo evento
-Authorization: Bearer {token}
-Content-Type: application/json
+## Estrutura do Backend
 
-{
-  "title": "Campanha de Doação de Sangue",
-  "description": "Doe sangue e salve vidas",
-  "location": "Campus Porto Alegre",
-  "start_date": "2025-11-01 09:00:00",
-  "end_date": "2025-11-01 17:00:00"
-}
-```
+O projeto usa arquitetura em camadas:
 
-## 🧪 Testes
+- **Routes:** Define as rotas da API
+- **Controllers:** Recebe as requisições e retorna respostas
+- **Services:** Contém a lógica de negócio
+- **Models:** Faz as consultas no banco de dados
 
-### Testes da API (REST Client)
+## O que foi implementado
 
-O projeto inclui um arquivo `projeto-jwt/src/tests/users_api_test.rest` com exemplos de requisições.
+- Login com JWT
+- Controle de usuários (admin/user)
+- Listar eventos
+- Criar eventos (só admin)
+- Proteção de rotas
+- Dashboard
 
-Para usar:
-1. Instale a extensão **REST Client** no VS Code (ou outro editor)
-2. Abra o arquivo `.rest`
-3. Clique em "Send Request" acima de cada requisição
+## Páginas do Frontend
 
-## 🏗️ Arquitetura
+**Públicas:**
+- Home
+- Login  
+- Lista de Eventos
 
-O backend segue a arquitetura em camadas:
-
-```
-┌─────────────────┐
-│     Routes      │  ← Define endpoints e métodos HTTP
-└────────┬────────┘
-         │
-┌────────▼────────┐
-│   Controllers   │  ← Recebe requisições, valida entrada
-└────────┬────────┘
-         │
-┌────────▼────────┐
-│    Services     │  ← Regras de negócio e lógica
-└────────┬────────┘
-         │
-┌────────▼────────┐
-│     Models      │  ← Acesso ao banco de dados
-└─────────────────┘
-```
-
-### Princípios Aplicados
-
-- ✅ **Clean Code**
-- ✅ **SOLID**
-- ✅ **RESTful API**
-
-## ✨ Funcionalidades
-
-### Implementadas ✅
-
-- [x] Autenticação com JWT
-- [x] Controle de acesso baseado em roles
-- [x] CRUD de eventos
-- [x] Proteção de rotas no frontend
-- [x] Dashboard para usuários autenticados
-- [x] Painel administrativo
-- [x] Logout seguro
-- [x] Feedback visual (mensagens de erro/sucesso)
-- [x] Formulários validados
-
-### Frontend
-
-- **Páginas Públicas:**
-  - Home (`/`)
-  - Login (`/login`)
-  - Lista de Eventos (`/events`)
-
-- **Páginas Protegidas:**
-  - Dashboard (`/dashboard`) - Requer autenticação
-  - Admin (`/admin`) - Requer role admin
-  - Criar Evento (`/create-event`) - Requer role admin
-
-### Frontend
-
-Recomendações para deploy:
-- **Vercel**, **Netlify** ou **Cloudflare Pages**
-- Configure a variável de ambiente da API
-- Build command: `npm run build`
-- Output directory: `dist`
+**Protegidas:**
+- Dashboard (precisa login)
+- Admin (só admin)
+- Criar Evento (só admin)
