@@ -7,6 +7,22 @@ class EventModel {
         );
         return rows;
     }
+
+    static async create(eventData) {
+        const { title, description, location, start_date, end_date } = eventData;
+        const [result] = await db.query(
+            'INSERT INTO events (title, description, location, start_date, end_date) VALUES (?, ?, ?, ?, ?)',
+            [title, description, location, start_date, end_date]
+        );
+        return {
+            id: result.insertId,
+            title,
+            description,
+            location,
+            start_date,
+            end_date
+        };
+    }
 }
 
 module.exports = EventModel; 
