@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { http } from "../api/http";
+import { useAuth } from "../auth/AuthContext";
+import Button from "../components/Button";
 
 export default function Events() {
     const [events, setEvents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const { user } = useAuth();
 
     useEffect(() => {
         http.get("/events")
@@ -15,7 +19,14 @@ export default function Events() {
 
     return (
         <section className="card">
-            <h1>Eventos</h1>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <h1>Eventos</h1>
+                {user?.role === "admin" && (
+                    <Link to="/events/create">
+                        <Button>Criar Evento</Button>
+                    </Link>
+                )}
+            </div>
             {loading && <p>Carregando...</p>}
             {error && <p>{error}</p>}
             {!loading && !error && (

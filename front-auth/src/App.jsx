@@ -9,6 +9,7 @@ import Forbidden from "./pages/Forbidden";
 import Dashboard from "./pages/Dashboard";
 import Admin from "./pages/Admin";
 import Events from "./pages/Events";
+import CreateEvent from "./pages/CreateEvent";
 
 function NotFound() {
   return (
@@ -43,6 +44,16 @@ const router = createBrowserRouter([
           <RequireAuth>
             <RequireRole role="admin">
               <Admin />
+            </RequireRole>
+          </RequireAuth>
+        ),
+      },
+      {
+        path: "events/create",
+        element: (
+          <RequireAuth>
+            <RequireRole role="admin">
+              <CreateEvent />
             </RequireRole>
           </RequireAuth>
         ),
