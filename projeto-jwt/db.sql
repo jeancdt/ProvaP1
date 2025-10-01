@@ -32,8 +32,8 @@ CREATE TABLE IF NOT EXISTS events (
  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Insere eventos fictícios
+-- Insere eventos
 INSERT INTO events (title, description, location, start_date, end_date) VALUES
-('Doação de Sangue', 'Campanha de doação de sangue aberta à comunidade.', 'Hospital Municipal', '2025-10-10 09:00:00', '2025-10-10 17:00:00'),
-('Mutirão Ambiental', 'Limpeza do Parque Central e plantio de mudas.', 'Parque Central', '2025-10-20 08:00:00', '2025-10-20 12:00:00'),
-('Arrecadação de Alimentos', 'Coleta de alimentos não perecíveis para famílias carentes.', 'Ginásio da Escola', '2025-11-05 10:00:00', '2025-11-05 16:00:00');
+('Evento 1', 'Desc Evento 1', 'Local Evento 1', '2025-10-10 09:00:00', '2025-10-10 17:00:00'),
+('Evento 2', 'Desc Evento 2', 'Local Evento 2', '2025-10-10 09:00:00', '2025-10-10 17:00:00'),
+('Evento 3', 'Desc Evento 3', 'Local Evento 3', '2025-10-10 09:00:00', '2025-10-10 17:00:00');
