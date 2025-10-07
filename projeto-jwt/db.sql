@@ -37,3 +37,20 @@ INSERT INTO events (title, description, location, start_date, end_date) VALUES
 ('Evento 1', 'Desc Evento 1', 'Local Evento 1', '2025-10-10 09:00:00', '2025-10-10 17:00:00'),
 ('Evento 2', 'Desc Evento 2', 'Local Evento 2', '2025-10-10 09:00:00', '2025-10-10 17:00:00'),
 ('Evento 3', 'Desc Evento 3', 'Local Evento 3', '2025-10-10 09:00:00', '2025-10-10 17:00:00');
+
+-- Cria a tabela de voluntários
+CREATE TABLE IF NOT EXISTS volunteers (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    phone VARCHAR(20) NOT NULL,
+    email VARCHAR(255) NULL UNIQUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Insere dados de voluntários
+INSERT INTO volunteers (name, phone, email) VALUES
+('Voluntario 1', '(54) 99999-9991', 'vol1@email.com'),
+('Voluntario 2', '(54) 99999-9992', 'vol2@email.com'),
+('Voluntario 3', '(54) 99999-9993', NULL),
+('Voluntario 4', '(54) 99999-9994', 'vol4@email.com'),
+('Voluntario 5', '(54) 99999-9995', NULL);
