@@ -78,6 +78,16 @@ const router = createBrowserRouter([
           </RequireAuth>
         ),
       },
+      {
+        path: "volunteers/edit/:id",
+        element: (
+          <RequireAuth>
+            <RequireRole role="admin">
+              <CreateVolunteer />
+            </RequireRole>
+          </RequireAuth>
+        ),
+      },
       { path: "*", element: <NotFound /> },
     ],
   },
