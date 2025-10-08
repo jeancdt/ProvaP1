@@ -23,6 +23,20 @@ class PublicController {
             });
         }
     }
+
+    static async getEventById(req, res) {
+        try {
+            const { id } = req.params;
+            const event = await EventService.getEventById(id);
+            return res.status(200).json(event);
+        } catch (error) {
+            const statusCode = error.message === 'Evento não encontrado' ? 404 : 500;
+            return res.status(statusCode).json({
+                message: 'Erro ao buscar evento',
+                error: error.message
+            });
+        }
+    }
 }
 
 module.exports = PublicController;
