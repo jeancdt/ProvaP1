@@ -59,9 +59,9 @@ const swaggerOptions = {
     definition: {
         openapi: "3.0.0",
         info: {
-            title: "API de Eventos e Autenticação",
+            title: "API de Eventos, Voluntários e Autenticação",
             version: "1.0.0",
-            description: "API para gerenciamento de eventos com autenticação JWT e integração MySQL.",
+            description: "API para gerenciamento de eventos e voluntários com autenticação JWT e integração MySQL.",
         },
         servers: [{ url: `http://localhost:${PORT}` }],
         components: {
@@ -115,6 +115,17 @@ const swaggerOptions = {
                         location: { type: "string", example: "Centro de Convenções" },
                         start_date: { type: "string", format: "date-time", example: "2025-10-15 09:00:00" },
                         end_date: { type: "string", format: "date-time", example: "2025-10-15 17:00:00" },
+                        created_at: { type: "string", format: "date-time", readOnly: true, example: "2024-01-01T10:00:00Z" }
+                    },
+                },
+                Volunteer: {
+                    type: "object",
+                    required: ["name", "phone", "email"],
+                    properties: {
+                        id: { type: "integer", readOnly: true, example: 1 },
+                        name: { type: "string", example: "João Silva" },
+                        phone: { type: "string", example: "(51) 98765-4321" },
+                        email: { type: "string", format: "email", example: "joao.silva@email.com" },
                         created_at: { type: "string", format: "date-time", readOnly: true, example: "2024-01-01T10:00:00Z" }
                     },
                 },
@@ -463,7 +474,47 @@ app.post("/protected/events", authenticateToken, authorizeRole(["admin"]), async
 
 // --- Rotas de Voluntários ---
 
-// Listar todos os voluntários (requer autenticação)
+/**
+ * @openapi
+ * /protected/volunteers:
+ *   get:
+ *     tags: [Voluntários, Protegidas]
+ *     summary: Lista todos os voluntários cadastrados (requer autenticação)
+ *     security: [{ bearerAuth: [] }]
+ *     responses:
+ *       200:
+ *         description: Lista de voluntários.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Lista de voluntários"
+ *                 volunteers:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Volunteer'
+ *       401:
+ *         description: Não autorizado (token ausente).
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMessage'
+ *       403:
+ *         description: Proibido (token inválido/expirado).
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMessage'
+ *       500:
+ *         description: Erro interno.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMessage'
+ */
 app.get("/protected/volunteers", authenticateToken, async (req, res) => {
     try {
         const [rows] = await pool.query("SELECT * FROM volunteers");
@@ -480,7 +531,6 @@ app.get("/protected/volunteers", authenticateToken, async (req, res) => {
     }
 });
 
-// Buscar voluntário por ID (requer autenticação)
 app.get("/protected/volunteers/:id", authenticateToken, async (req, res) => {
     try {
         const { id } = req.params;
@@ -506,7 +556,69 @@ app.get("/protected/volunteers/:id", authenticateToken, async (req, res) => {
     }
 });
 
-// Criar novo voluntário (somente admin)
+/**
+ * @openapi
+ * /protected/volunteers:
+ *   post:
+ *     tags: [Voluntários, Protegidas]
+ *     summary: Cadastra um novo voluntário (somente para administradores)
+ *     security: [{ bearerAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: ["name", "phone", "email"]
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: "João Silva"
+ *               phone:
+ *                 type: string
+ *                 example: "(51) 98765-4321"
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: "joao.silva@email.com"
+ *     responses:
+ *       201:
+ *         description: Voluntário criado com sucesso.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Voluntário criado com sucesso"
+ *                 volunteer:
+ *                   $ref: '#/components/schemas/Volunteer'
+ *       400:
+ *         description: Dados inválidos (campos obrigatórios faltando ou formato inválido).
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMessage'
+ *       401:
+ *         description: Não autorizado (token ausente).
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMessage'
+ *       403:
+ *         description: Proibido (token inválido/expirado ou não é admin).
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMessage'
+ *       500:
+ *         description: Erro interno.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMessage'
+ */
 app.post("/protected/volunteers", authenticateToken, authorizeRole(["admin"]), async (req, res) => {
     try {
         const { name, phone, email } = req.body;
@@ -559,7 +671,82 @@ app.post("/protected/volunteers", authenticateToken, authorizeRole(["admin"]), a
     }
 });
 
-// Atualizar voluntário (somente admin)
+/**
+ * @openapi
+ * /protected/volunteers/{id}:
+ *   put:
+ *     tags: [Voluntários, Protegidas]
+ *     summary: Atualiza os dados de um voluntário (somente para administradores)
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID do voluntário a ser atualizado
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: ["name", "phone", "email"]
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: "João Silva Atualizado"
+ *               phone:
+ *                 type: string
+ *                 example: "(51) 98765-0000"
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: "joao.silva.novo@email.com"
+ *     responses:
+ *       200:
+ *         description: Voluntário atualizado com sucesso.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Voluntário atualizado com sucesso"
+ *                 volunteer:
+ *                   $ref: '#/components/schemas/Volunteer'
+ *       400:
+ *         description: Dados inválidos (campos obrigatórios faltando ou formato inválido).
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMessage'
+ *       401:
+ *         description: Não autorizado (token ausente).
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMessage'
+ *       403:
+ *         description: Proibido (token inválido/expirado ou não é admin).
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMessage'
+ *       404:
+ *         description: Voluntário não encontrado.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMessage'
+ *       500:
+ *         description: Erro interno.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMessage'
+ */
 app.put("/protected/volunteers/:id", authenticateToken, authorizeRole(["admin"]), async (req, res) => {
     try {
         const { id } = req.params;
@@ -615,7 +802,50 @@ app.put("/protected/volunteers/:id", authenticateToken, authorizeRole(["admin"])
     }
 });
 
-// Excluir voluntário (somente admin)
+/**
+ * @openapi
+ * /protected/volunteers/{id}:
+ *   delete:
+ *     tags: [Voluntários, Protegidas]
+ *     summary: Exclui um voluntário do sistema (somente para administradores)
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID do voluntário a ser excluído
+ *     responses:
+ *       200:
+ *         description: Voluntário excluído com sucesso.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Voluntário excluído com sucesso"
+ *       401:
+ *         description: Não autorizado (token ausente).
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMessage'
+ *       403:
+ *         description: Proibido (token inválido/expirado ou não é admin).
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMessage'
+ *       404:
+ *         description: Voluntário não encontrado.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMessage'
+ */
 app.delete("/protected/volunteers/:id", authenticateToken, authorizeRole(["admin"]), async (req, res) => {
     try {
         const { id } = req.params;
