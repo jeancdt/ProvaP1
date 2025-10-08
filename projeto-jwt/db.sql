@@ -54,3 +54,23 @@ INSERT INTO volunteers (name, phone, email) VALUES
 ('Voluntario 3', '(54) 99999-9993', NULL),
 ('Voluntario 4', '(54) 99999-9994', 'vol4@email.com'),
 ('Voluntario 5', '(54) 99999-9995', NULL);
+
+-- Cria a tabela relacional entre eventos e voluntários
+CREATE TABLE IF NOT EXISTS event_volunteers (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    event_id INT NOT NULL,
+    volunteer_id INT NOT NULL,
+    FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
+    FOREIGN KEY (volunteer_id) REFERENCES volunteers(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_event_volunteer (event_id, volunteer_id)
+);
+
+-- Insere dados de voluntários de eventos
+INSERT INTO event_volunteers (event_id, volunteer_id) VALUES
+(1, 1),
+(1, 2),
+(1, 3),
+(2, 2),
+(2, 4),
+(3, 1),
+(3, 5);
