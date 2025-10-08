@@ -33,7 +33,7 @@ const pool = mysql.createPool({
 // --- Middleware de Autenticação JWT ---
 function authenticateToken(req, res, next) {
     const authHeader = req.headers["authorization"];
-    const token = authHeader && authHeader.split(" ")[1];
+    const token = authHeader?.split(" ")[1];
 
     if (!token) return res.status(401).json({ message: "Token não fornecido" });
 
@@ -458,6 +458,185 @@ app.post("/protected/events", authenticateToken, authorizeRole(["admin"]), async
     } catch (error) {
         console.error("Erro ao criar evento:", error);
         res.status(500).json({ message: "Erro interno do servidor." });
+    }
+});
+
+// --- Rotas de Voluntários ---
+
+// Listar todos os voluntários (requer autenticação)
+app.get("/protected/volunteers", authenticateToken, async (req, res) => {
+    try {
+        const [rows] = await pool.query("SELECT * FROM volunteers");
+        res.status(200).json({
+            message: "Lista de voluntários",
+            volunteers: rows
+        });
+    } catch (error) {
+        console.error("Erro ao listar voluntários:", error);
+        res.status(500).json({
+            message: "Erro ao listar voluntários",
+            error: error.message
+        });
+    }
+});
+
+// Buscar voluntário por ID (requer autenticação)
+app.get("/protected/volunteers/:id", authenticateToken, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const [rows] = await pool.query("SELECT * FROM volunteers WHERE id = ?", [id]);
+        
+        if (rows.length === 0) {
+            return res.status(404).json({
+                message: "Voluntário não encontrado",
+                error: "Voluntário não encontrado"
+            });
+        }
+        
+        res.status(200).json({
+            message: "Voluntário encontrado",
+            volunteer: rows[0]
+        });
+    } catch (error) {
+        console.error("Erro ao buscar voluntário:", error);
+        res.status(404).json({
+            message: "Voluntário não encontrado",
+            error: error.message
+        });
+    }
+});
+
+// Criar novo voluntário (somente admin)
+app.post("/protected/volunteers", authenticateToken, authorizeRole(["admin"]), async (req, res) => {
+    try {
+        const { name, phone, email } = req.body;
+
+        // Validação dos campos obrigatórios
+        if (!name || !phone || !email) {
+            return res.status(400).json({
+                message: "Todos os campos são obrigatórios (name, phone, email)"
+            });
+        }
+
+        // Validação básica de email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({
+                message: "Email inválido"
+            });
+        }
+
+        // Validação básica de telefone
+        const phoneRegex = /^[\d\s-()]+$/;
+        if (!phoneRegex.test(phone)) {
+            return res.status(400).json({
+                message: "Telefone inválido"
+            });
+        }
+
+        const [result] = await pool.query(
+            "INSERT INTO volunteers (name, phone, email) VALUES (?, ?, ?)",
+            [name, phone, email]
+        );
+
+        const volunteer = {
+            id: result.insertId,
+            name,
+            phone,
+            email
+        };
+
+        res.status(201).json({
+            message: "Voluntário criado com sucesso",
+            volunteer
+        });
+    } catch (error) {
+        console.error("Erro ao criar voluntário:", error);
+        res.status(500).json({
+            message: "Erro ao criar voluntário",
+            error: error.message
+        });
+    }
+});
+
+// Atualizar voluntário (somente admin)
+app.put("/protected/volunteers/:id", authenticateToken, authorizeRole(["admin"]), async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, phone, email } = req.body;
+
+        // Validação dos campos obrigatórios
+        if (!name || !phone || !email) {
+            return res.status(400).json({
+                message: "Todos os campos são obrigatórios (name, phone, email)"
+            });
+        }
+
+        // Validação básica de email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({
+                message: "Email inválido"
+            });
+        }
+
+        // Validação básica de telefone
+        const phoneRegex = /^[\d\s-()]+$/;
+        if (!phoneRegex.test(phone)) {
+            return res.status(400).json({
+                message: "Telefone inválido"
+            });
+        }
+
+        const [result] = await pool.query(
+            "UPDATE volunteers SET name = ?, phone = ?, email = ? WHERE id = ?",
+            [name, phone, email, id]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({
+                message: "Erro ao atualizar voluntário",
+                error: "Voluntário não encontrado"
+            });
+        }
+
+        const volunteer = { id, name, phone, email };
+
+        res.status(200).json({
+            message: "Voluntário atualizado com sucesso",
+            volunteer
+        });
+    } catch (error) {
+        console.error("Erro ao atualizar voluntário:", error);
+        res.status(404).json({
+            message: "Erro ao atualizar voluntário",
+            error: error.message
+        });
+    }
+});
+
+// Excluir voluntário (somente admin)
+app.delete("/protected/volunteers/:id", authenticateToken, authorizeRole(["admin"]), async (req, res) => {
+    try {
+        const { id } = req.params;
+        const [result] = await pool.query("DELETE FROM volunteers WHERE id = ?", [id]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({
+                message: "Erro ao excluir voluntário",
+                error: "Voluntário não encontrado"
+            });
+        }
+
+        res.status(200).json({
+            message: "Voluntário excluído com sucesso"
+        });
+    } catch (error) {
+        console.error("Erro ao excluir voluntário:", error);
+        res.status(404).json({
+            message: "Erro ao excluir voluntário",
+            error: error.message
+        });
     }
 });
 
