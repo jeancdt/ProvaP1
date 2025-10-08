@@ -95,7 +95,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQ
 
 ### Listar todos os voluntários
 GET {{baseURL}}/protected/volunteers
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGlmcnMuZWR1LmJyIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzU5ODkzMDIwLCJleHAiOjE3NTk4OTY2MjB9.K_sau3eknAh6rAQizRXQo4qVsG89lZHtWad3vrxKoAI
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGlmcnMuZWR1LmJyIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzU5OTA3MDQ1LCJleHAiOjE3NTk5MTA2NDV9.iPhmXlxhAKNozctNzPsorEvmZV9VhCUnLcladiAx04g
 
 ### Buscar voluntário por ID
 GET {{baseURL}}/protected/volunteers/1
