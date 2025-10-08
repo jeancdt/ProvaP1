@@ -33,13 +33,15 @@ class EventModel {
     const event = events[0];
 
     const [volunteers] = await db.query(
-      `SELECT v.name 
+      `SELECT v.id, v.name 
             FROM volunteers v 
             INNER JOIN event_volunteers ev ON v.id = ev.volunteer_id 
             WHERE ev.event_id = ?`,
       [id]
     );
+
     event.volunteers = volunteers.map((v) => v.name).join(", ");
+    event.volunteer_ids = volunteers.map((v) => v.id);
 
     return event;
   }
