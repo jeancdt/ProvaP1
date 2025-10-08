@@ -10,6 +10,8 @@ import Dashboard from "./pages/Dashboard";
 import Admin from "./pages/Admin";
 import Events from "./pages/Events";
 import CreateEvent from "./pages/CreateEvent";
+import Volunteers from "./pages/Volunteers";
+import CreateVolunteer from "./pages/CreateVolunteer";
 
 function NotFound() {
   return (
@@ -54,6 +56,24 @@ const router = createBrowserRouter([
           <RequireAuth>
             <RequireRole role="admin">
               <CreateEvent />
+            </RequireRole>
+          </RequireAuth>
+        ),
+      },
+      {
+        path: "volunteers",
+        element: (
+          <RequireAuth>
+            <Volunteers />
+          </RequireAuth>
+        ),
+      },
+      {
+        path: "volunteers/create",
+        element: (
+          <RequireAuth>
+            <RequireRole role="admin">
+              <CreateVolunteer />
             </RequireRole>
           </RequireAuth>
         ),
