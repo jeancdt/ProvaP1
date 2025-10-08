@@ -9,12 +9,27 @@ export default function Events() {
   const [error, setError] = useState("");
   const { user } = useAuth();
 
-  useEffect(() => {
+  const loadEvents = () => {
     http
       .get("/events")
       .then(({ data }) => setEvents(Array.isArray(data) ? data : []))
-      .catch(() => setError("Erro ao carregar eventos"))
+      .catch(() => setError("Erro ao carregar eventos"));
+  };
+
+  useEffect(() => {
+    loadEvents();
   }, []);
+
+  const handleDelete = async (id, title) => {
+    if (window.confirm(`Tem certeza que deseja excluir o evento "${title}"?`)) {
+      try {
+        await http.delete(`/protected/events/${id}`);
+        loadEvents();
+      } catch (err) {
+        alert(err.response?.data?.message || "Erro ao excluir evento");
+      }
+    }
+  };
 
   return (
     <section className="card">
@@ -36,32 +51,75 @@ export default function Events() {
               <thead>
                 <tr>
                   <th style={{ border: "1px solid #000", padding: "0.5rem", textAlign: "center" }}>Título</th>
+                  <th style={{ border: "1px solid #000", padding: "0.5rem", textAlign: "center" }}>Descrição</th>
                   <th style={{ border: "1px solid #000", padding: "0.5rem", textAlign: "center" }}>Local</th>
+                  <th style={{ border: "1px solid #000", padding: "0.5rem", textAlign: "center" }}>Voluntários</th>
                   <th style={{ border: "1px solid #000", padding: "0.5rem", textAlign: "center" }}>Início</th>
                   <th style={{ border: "1px solid #000", padding: "0.5rem", textAlign: "center" }}>Fim</th>
+                  {user?.role === "admin" && (
+                    <th style={{ border: "1px solid #000", padding: "0.5rem", textAlign: "center" }}>Ações</th>
+                  )}
                 </tr>
               </thead>
               <tbody>
-                {events.map((ev) => (
-                  <tr key={ev.id}>
+                {events.map((event) => (
+                  <tr key={event.id}>
                     <td style={{ borderLeft: "1px solid #000", borderRight: "1px solid #000", padding: "0.5rem" }}>
-                      {ev.title}
+                      {event.title}
                     </td>
                     <td style={{ borderLeft: "1px solid #000", borderRight: "1px solid #000", padding: "0.5rem" }}>
-                      {ev.location || "-"}
+                      {event.description || "-"}
                     </td>
                     <td style={{ borderLeft: "1px solid #000", borderRight: "1px solid #000", padding: "0.5rem" }}>
-                      {new Date(ev.start_date).toLocaleString()}
+                      {event.location || "-"}
                     </td>
                     <td style={{ borderLeft: "1px solid #000", borderRight: "1px solid #000", padding: "0.5rem" }}>
-                      {ev.end_date ? new Date(ev.end_date).toLocaleString() : "-"}
+                      {event.volunteers || "Sem voluntários"}
                     </td>
+                    <td style={{ borderLeft: "1px solid #000", borderRight: "1px solid #000", padding: "0.5rem" }}>
+                      {new Date(event.start_date).toLocaleString()}
+                    </td>
+                    <td style={{ borderLeft: "1px solid #000", borderRight: "1px solid #000", padding: "0.5rem" }}>
+                      {event.end_date ? new Date(event.end_date).toLocaleString() : "-"}
+                    </td>
+                    {user?.role === "admin" && (
+                      <td
+                        style={{
+                          borderLeft: "1px solid #000",
+                          borderRight: "1px solid #000",
+                          padding: "0.5rem",
+                          textAlign: "center",
+                        }}
+                      >
+                        <div style={{ display: "flex", gap: "0.5rem", justifyContent: "center" }}>
+                          <Link to={`/events/edit/${event.id}`}>
+                            <Button>Editar</Button>
+                          </Link>
+                          <button
+                            style={{
+                              backgroundColor: "red",
+                              color: "white",
+                              border: "none",
+                              padding: "0.5rem",
+                              borderRadius: "0.5rem",
+                              cursor: "pointer"
+                            }}
+                            onClick={() => handleDelete(event.id, event.title)}
+                          >
+                            Excluir
+                          </button>
+                        </div>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
               <tfoot>
                 <tr>
-                  <td colSpan="4" style={{ border: "1px solid #000", padding: "0.5rem", textAlign: "center" }}>
+                  <td
+                    colSpan={user?.role === "admin" ? "7" : "6"}
+                    style={{ border: "1px solid #000", padding: "0.5rem", textAlign: "center" }}
+                  >
                     Total de eventos: {events.length}
                   </td>
                 </tr>
