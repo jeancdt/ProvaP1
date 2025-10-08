@@ -6,7 +6,6 @@ import Button from "../components/Button";
 
 export default function Events() {
   const [events, setEvents] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const { user } = useAuth();
 
@@ -15,7 +14,6 @@ export default function Events() {
       .get("/events")
       .then(({ data }) => setEvents(Array.isArray(data) ? data : []))
       .catch(() => setError("Erro ao carregar eventos"))
-      .finally(() => setLoading(false));
   }, []);
 
   return (
@@ -28,10 +26,8 @@ export default function Events() {
           </Link>
         )}
       </div>
-      {loading && <p>Carregando...</p>}
       {error && <p>{error}</p>}
-      {!loading &&
-        !error &&
+      {!error &&
         (events.length === 0 ? (
           <p>Nenhum evento encontrado.</p>
         ) : (
