@@ -61,6 +61,16 @@ const router = createBrowserRouter([
         ),
       },
       {
+        path: "events/edit/:id",
+        element: (
+          <RequireAuth>
+            <RequireRole role="admin">
+              <CreateEvent />
+            </RequireRole>
+          </RequireAuth>
+        ),
+      },
+      {
         path: "volunteers",
         element: (
           <RequireAuth>
