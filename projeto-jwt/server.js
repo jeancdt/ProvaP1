@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const swaggerUi = require("swagger-ui-express");
 const swaggerJsdoc = require("swagger-jsdoc");
 const jwt = require("jsonwebtoken");
@@ -9,6 +10,12 @@ require("dotenv").config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET;
+
+// Configuração do CORS para permitir requisições do frontend
+app.use(cors({
+    origin: 'http://localhost:5173', // URL do frontend Vite
+    credentials: true
+}));
 
 app.use(express.json());
 
@@ -89,6 +96,13 @@ const swaggerOptions = {
                     properties: {
                         message: { type: "string", example: "Login bem-sucedido!" },
                         token: { type: "string", example: "eyJhbGciOiJIUzI1Ni..." },
+                        user: {
+                            type: "object",
+                            properties: {
+                                email: { type: "string", example: "usuario@ifrs.edu.br" },
+                                role: { type: "string", example: "user" }
+                            }
+                        }
                     },
                 },
                 Event: {
@@ -282,7 +296,16 @@ app.post("/auth/login", async (req, res) => {
         }
 
         const token = jwt.sign({ email: user.email, role: user.role }, JWT_SECRET, { expiresIn: "1h" });
-        res.json({ message: "Login bem-sucedido!", token });
+        
+        // Retorna o token e as informações do usuário (sem a senha)
+        res.json({ 
+            message: "Login bem-sucedido!", 
+            token,
+            user: {
+                email: user.email,
+                role: user.role
+            }
+        });
     } catch (error) {
         console.error("Erro ao fazer login:", error);
         res.status(500).json({ message: "Erro interno do servidor." });
