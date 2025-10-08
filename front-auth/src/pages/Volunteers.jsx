@@ -9,12 +9,27 @@ export default function Volunteers() {
   const [error, setError] = useState("");
   const { user } = useAuth();
 
-  useEffect(() => {
+  const loadVolunteers = () => {
     http
       .get("/protected/volunteers")
       .then(({ data }) => setVolunteers(data.volunteers || []))
       .catch(() => setError("Erro ao carregar voluntários"));
+  };
+
+  useEffect(() => {
+    loadVolunteers();
   }, []);
+
+  const handleDelete = async (id, name) => {
+    if (window.confirm(`Tem certeza que deseja excluir o voluntário "${name}"?`)) {
+      try {
+        await http.delete(`/protected/volunteers/${id}`);
+        loadVolunteers();
+      } catch (err) {
+        alert(err.response?.data?.message || "Erro ao excluir voluntário");
+      }
+    }
+  };
 
   return (
     <section className="card">
@@ -39,6 +54,7 @@ export default function Volunteers() {
                   <th style={{ border: "1px solid #000", padding: "0.5rem", textAlign: "center" }}>Telefone</th>
                   <th style={{ border: "1px solid #000", padding: "0.5rem", textAlign: "center" }}>Email</th>
                   <th style={{ border: "1px solid #000", padding: "0.5rem", textAlign: "center" }}>Data de Cadastro</th>
+                  <th style={{ border: "1px solid #000", padding: "0.5rem", textAlign: "center" }}>Ações</th>
                 </tr>
               </thead>
               <tbody>
@@ -56,12 +72,32 @@ export default function Volunteers() {
                     <td style={{ borderLeft: "1px solid #000", borderRight: "1px solid #000", padding: "0.5rem" }}>
                       {volunteer.created_at ? new Date(volunteer.created_at).toLocaleDateString() : "-"}
                     </td>
+                    {user?.role === "admin" && (
+                      <td
+                        style={{
+                          borderLeft: "1px solid #000",
+                          borderRight: "1px solid #000",
+                          padding: "0.5rem",
+                          textAlign: "center",
+                        }}
+                      >
+                        <div style={{ display: "flex", gap: "0.5rem", justifyContent: "center" }}>
+                          <Link to={`/volunteers/edit/${volunteer.id}`}>
+                            <Button>Editar</Button>
+                          </Link>
+                          <button style={{ backgroundColor: "red", color: "white", border: "none", padding: "0.5rem", borderRadius: "0.5rem" }} onClick={() => handleDelete(volunteer.id, volunteer.name)}>Excluir</button>
+                        </div>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
               <tfoot>
                 <tr>
-                  <td colSpan="4" style={{ border: "1px solid #000", padding: "0.5rem", textAlign: "center" }}>
+                  <td
+                    colSpan={user?.role === "admin" ? "5" : "4"}
+                    style={{ border: "1px solid #000", padding: "0.5rem", textAlign: "center" }}
+                  >
                     Total de voluntários: {volunteers.length}
                   </td>
                 </tr>
