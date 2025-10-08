@@ -52,12 +52,12 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQ
 
 ### Acesso à área admin (rota protegida, requer token de usuário com role "admin")
 GET {{baseURL}}/protected/admin
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGlmcnMuZWR1LmJyIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzU2MzMzMjU3LCJleHAiOjE3NTYzMzY4NTd9.qBvkYosO3o0CXpG6L_LhblWHaBa5e-OsznChx4IIods
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGlmcnMuZWR1LmJyIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzU5ODkzMDIwLCJleHAiOjE3NTk4OTY2MjB9.K_sau3eknAh6rAQizRXQo4qVsG89lZHtWad3vrxKoAI
 
 ### Criar evento (somente admin)
 POST {{baseURL}}/protected/events
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGlmcnMuZWR1LmJyIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzU5MzQ3MTMzLCJleHAiOjE3NTkzNTA3MzN9.GGdOpVHz_v3PGoR952J0O8O5N_v_GKGf7sMRy7WJ1xs
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGlmcnMuZWR1LmJyIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzU5ODkzMDIwLCJleHAiOjE3NTk4OTY2MjB9.K_sau3eknAh6rAQizRXQo4qVsG89lZHtWad3vrxKoAI
 
 {
   "title": "Evento Teste",
@@ -66,3 +66,37 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQ
   "end_date": "2025-10-15 17:00:00",
   "location": "Local do evento"
 }
+
+### Listar todos os voluntários
+GET {{baseURL}}/protected/volunteers
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGlmcnMuZWR1LmJyIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzU5ODkzMDIwLCJleHAiOjE3NTk4OTY2MjB9.K_sau3eknAh6rAQizRXQo4qVsG89lZHtWad3vrxKoAI
+
+### Buscar voluntário por ID
+GET {{baseURL}}/protected/volunteers/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGlmcnMuZWR1LmJyIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzU5ODkzMDIwLCJleHAiOjE3NTk4OTY2MjB9.K_sau3eknAh6rAQizRXQo4qVsG89lZHtWad3vrxKoAI
+
+### Criar novo voluntário (admin)
+POST {{baseURL}}/protected/volunteers
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGlmcnMuZWR1LmJyIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzU5ODkzMDIwLCJleHAiOjE3NTk4OTY2MjB9.K_sau3eknAh6rAQizRXQo4qVsG89lZHtWad3vrxKoAI
+
+{
+  "name": "Voluntario teste",
+  "phone": "(54) 99999-9999",
+  "email": "voluntario@teste.com"
+}
+
+### Atualizar voluntário (admin)
+PUT {{baseURL}}/protected/volunteers/1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGlmcnMuZWR1LmJyIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzU5ODkzMDIwLCJleHAiOjE3NTk4OTY2MjB9.K_sau3eknAh6rAQizRXQo4qVsG89lZHtWad3vrxKoAI
+
+{
+  "name": "VOLUNTARIO TESTE",
+  "phone": "(54) 99999-8888",
+  "email": "VOLUNTARIO@teste.com"
+}
+
+### Excluir voluntário por ID (admin)
+DELETE {{baseURL}}/protected/volunteers/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGlmcnMuZWR1LmJyIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzU5ODkzMDIwLCJleHAiOjE3NTk4OTY2MjB9.K_sau3eknAh6rAQizRXQo4qVsG89lZHtWad3vrxKoAI
