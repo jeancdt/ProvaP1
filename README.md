@@ -1,16 +1,18 @@
 # Sistema de Voluntariado IFRS
 
-Prova P1 - Desenvolvimento Web
+Prova P1 - Desenvolvimento de Aplicações Corporativas
 
 ## Sobre o Projeto
 
-Sistema para gerenciar eventos. Foi desenvolvido usando Node.js no backend e React no frontend.
+Sistema para gerenciar eventos e voluntários. Foi desenvolvido usando Node.js no backend e React no frontend.
 
 Principais funcionalidades:
 - Login com JWT
 - Controle de usuários (admin e user)
-- Cadastro e listagem de eventos
+- CRUD completo de eventos (criar, listar, editar e excluir)
+- CRUD completo de voluntários (criar, listar, editar e excluir)
 - Arquitetura em camadas (Model-Service-Controller)
+- Proteção de rotas por autenticação e autorização
 
 ## Tecnologias Utilizadas
 
@@ -93,28 +95,47 @@ Vai rodar em http://localhost:5173
 O banco já vem com 2 usuários:
 
 - **Usuário comum:** usuario@ifrs.edu.br / 123456
+  - Pode ver o dashboard, listar eventos e voluntários
+  - Não consegue criar, editar ou deletar nada
+  
 - **Admin:** admin@ifrs.edu.br / admin123
+  - Tem acesso total ao sistema
+  - Pode criar, editar e deletar eventos e voluntários
+
+**Dica:** Loga com os dois usuários em abas diferentes pra ver a diferença de permissões!
 
 ## Principais Rotas da API
 
-**Login:**
+**Autenticação:**
 ```
 POST /auth/login
 ```
 
-**Listar eventos (pública):**
+**Rotas Públicas:**
 ```
-GET /events
-```
-
-**Dashboard (precisa estar logado):**
-```
-GET /dashboard
+GET /events - Listar todos os eventos
 ```
 
-**Criar evento (só admin):**
+**Rotas Protegidas (logado - user/admin):**
 ```
-POST /events
+GET /dashboard - Painel do usuário
+GET /admin - Painel admin (só admin)
+```
+
+**Eventos (admin):**
+```
+POST /events - Criar evento
+PUT /events/:id - Editar evento
+DELETE /events/:id - Excluir evento
+```
+
+**Voluntários (admin):**
+```
+GET /volunteers - Listar voluntários (precisa login)
+GET /volunteers/:id - Buscar voluntário por ID (precisa login)
+POST /volunteers - Cadastrar voluntário (só admin)
+PUT /volunteers/:id - Editar voluntário (só admin)
+DELETE /volunteers/:id - Excluir voluntário (só admin)
 ```
 
 Tem um arquivo `projeto-jwt/src/tests/users_api_test.rest` com exemplos de como testar as rotas.
@@ -128,14 +149,22 @@ O projeto usa arquitetura em camadas:
 - **Services:** Contém a lógica de negócio
 - **Models:** Faz as consultas no banco de dados
 
+Tem 3 arquivos de rotas separados:
+- `auth.routes.js` - Login
+- `public.routes.js` - Rotas abertas (sem login)
+- `protected.routes.js` - Rotas que precisam de autenticação
+
 ## O que foi implementado
 
 - Login com JWT
-- Controle de usuários (admin/user)
-- Listar eventos
-- Criar eventos (só admin)
-- Proteção de rotas
-- Dashboard
+- Controle de acesso por roles (admin/user)
+- CRUD completo de eventos (criar, listar, editar, deletar)
+- CRUD completo de voluntários (criar, listar, editar, deletar)
+- Proteção de rotas por autenticação
+- Autorização por role (admin tem acesso total, user só visualiza)
+- Dashboard personalizado
+- Validação de dados no backend
+- Interface responsiva no frontend
 
 ## Páginas do Frontend
 
@@ -144,7 +173,22 @@ O projeto usa arquitetura em camadas:
 - Login  
 - Lista de Eventos
 
-**Protegidas:**
-- Dashboard (precisa login)
-- Admin (só admin)
-- Criar Evento (só admin)
+**Protegidas (precisa estar logado):**
+- Dashboard
+- Lista de Voluntários
+
+**Só Admin:**
+- Painel Admin
+- Criar Evento
+- Editar Evento
+- Cadastrar Voluntário
+- Editar Voluntário
+
+## Observações
+
+- O token JWT expira em 24h (configurável no .env)
+- Todas as senhas são criptografadas com bcrypt
+- As validações acontecem tanto no frontend quanto no backend
+- Se tentar acessar uma rota protegida sem login, é redirecionado pro login
+- Se um usuário comum tentar acessar área de admin, aparece página "Acesso Negado"
+- O projeto já está configurado com CORS pra aceitar requisições do frontend
