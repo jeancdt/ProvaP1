@@ -1,12 +1,24 @@
 @baseURL = http://localhost:3000
 
-### Rota pública HOME (acesso livre)
+### ========================================
+### ROTAS PÚBLICAS
+### ========================================
+
+### Rota pública HOME
 GET {{baseURL}}/
 Content-Type: application/json
 
-### Rota pública EVENTOS (acesso livre)
+### Listar todos os eventos
 GET {{baseURL}}/events
 Content-Type: application/json
+
+### Buscar evento específico por ID
+GET {{baseURL}}/events/5
+Content-Type: application/json
+
+### ========================================
+### AUTENTICAÇÃO
+### ========================================
 
 ### Cadastro de novo usuário
 POST {{baseURL}}/auth/register
@@ -16,15 +28,6 @@ Content-Type: application/json
  "email": "novo@ifrs.edu.br",
   "password": "senha123",
  "role": "user"
-}
-
-### Login do novo usuário (pegar o token gerado abaixo)
-POST {{baseURL}}/auth/login
-Content-Type: application/json
-
-{
- "email": "novo@ifrs.edu.br",
- "password": "senha123"
 }
 
 ### Login do usuário comum (usuário já existente no banco)
@@ -45,27 +48,50 @@ Content-Type: application/json
  "password": "admin123"
 }
 
-### Acesso ao painel (rota protegida, requer token de qualquer usuário
-autenticado)
+### ========================================
+### ROTAS PROTEGIDAS
+### ========================================
+
+### Acesso ao painel
 GET {{baseURL}}/protected/dashboard
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGlmcnMuZWR1LmJyIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzU2MzMzMjU3LCJleHAiOjE3NTYzMzY4NTd9.qBvkYosO3o0CXpG6L_LhblWHaBa5e-OsznChx4IIods
 
-### Acesso à área admin (rota protegida, requer token de usuário com role "admin")
+### Acesso à área admin
 GET {{baseURL}}/protected/admin
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGlmcnMuZWR1LmJyIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzU5ODkzMDIwLCJleHAiOjE3NTk4OTY2MjB9.K_sau3eknAh6rAQizRXQo4qVsG89lZHtWad3vrxKoAI
 
-### Criar evento (somente admin)
+
+### Criar evento
 POST {{baseURL}}/protected/events
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGlmcnMuZWR1LmJyIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzU5ODkzMDIwLCJleHAiOjE3NTk4OTY2MjB9.K_sau3eknAh6rAQizRXQo4qVsG89lZHtWad3vrxKoAI
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGlmcnMuZWR1LmJyIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzU5OTA3MDQ1LCJleHAiOjE3NTk5MTA2NDV9.iPhmXlxhAKNozctNzPsorEvmZV9VhCUnLcladiAx04g
 
 {
   "title": "Evento Teste",
   "description": "Descrição do evento teste",
+  "location": "Local do evento",
   "start_date": "2025-10-15 09:00:00",
   "end_date": "2025-10-15 17:00:00",
-  "location": "Local do evento"
+  "volunteer_ids": [1, 2]
 }
+
+### Atualizar evento
+PUT {{baseURL}}/protected/events/6
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGlmcnMuZWR1LmJyIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzU5OTA3MDQ1LCJleHAiOjE3NTk5MTA2NDV9.iPhmXlxhAKNozctNzPsorEvmZV9VhCUnLcladiAx04g
+
+{
+  "title": "Evento 2 - Totalmente Atualizado",
+  "description": "Nova descrição completa",
+  "location": "Novo Local",
+  "start_date": "2025-11-01 10:00:00",
+  "end_date": "2025-11-01 16:00:00",
+  "volunteer_ids": [1, 3]
+}
+
+### Excluir evento por ID
+DELETE {{baseURL}}/protected/events/6
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGlmcnMuZWR1LmJyIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzU5OTA3MDQ1LCJleHAiOjE3NTk5MTA2NDV9.iPhmXlxhAKNozctNzPsorEvmZV9VhCUnLcladiAx04g
 
 ### Listar todos os voluntários
 GET {{baseURL}}/protected/volunteers
