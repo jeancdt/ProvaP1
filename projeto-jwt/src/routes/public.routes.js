@@ -4,5 +4,6 @@ const router = express.Router();
 
 router.get('/', PublicController.home);
 router.get('/events', PublicController.listEvents);
+router.get('/events/:id', PublicController.getEventById);
 
 module.exports = router;
