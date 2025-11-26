@@ -1,0 +1,59 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         Int      @id @default(autoincrement())
+  email      String   @unique @db.VarChar(255)
+  password   String   @db.VarChar(255)
+  role       String   @default("user") @db.VarChar(50)
+  created_at DateTime @default(now()) @map("created_at")
+
+  @@map("users")
+}
+
+model Event {
+  id          Int       @id @default(autoincrement())
+  title       String    @db.VarChar(255)
+  description String?   @db.Text
+  location    String?   @db.VarChar(255)
+  start_date  DateTime  @map("start_date")
+  end_date    DateTime? @map("end_date")
+  created_at  DateTime  @default(now()) @map("created_at")
+
+  volunteers EventVolunteer[]
+
+  @@map("events")
+}
+
+model Volunteer {
+  id         Int      @id @default(autoincrement())
+  name       String   @db.VarChar(255)
+  phone      String   @db.VarChar(20)
+  email      String?  @unique @db.VarChar(255)
+  created_at DateTime @default(now()) @map("created_at")
+
+  events EventVolunteer[]
+
+  @@map("volunteers")
+}
+
+model EventVolunteer {
+  id           Int @id @default(autoincrement())
+  event_id     Int @map("event_id")
+  volunteer_id Int @map("volunteer_id")
+
+  event     Event     @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  volunteer Volunteer @relation(fields: [volunteer_id], references: [id], onDelete: Cascade)
+
+  @@unique([event_id, volunteer_id], name: "unique_event_volunteer")
+  @@map("event_volunteers")
+}
