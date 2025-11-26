@@ -1,5 +1,6 @@
 const EventService = require("../services/eventService");
 const VolunteerService = require("../services/volunteerService");
+const logger = require("../config/logger.config");
 
 /**
  * Controller para rotas protegidas (requer autenticação)
@@ -16,11 +17,13 @@ class ProtectedController {
    */
   static dashboard(req, res) {
     try {
+      logger.info(`Acesso ao dashboard - User: ${req.user.email}`);
       return res.status(200).json({
         message: `Bem-vindo ao painel,
            ${req.user.email}`,
       });
     } catch (error) {
+      logger.error(`Erro ao acessar dashboard - User: ${req.user.email}`, { stack: error.stack });
       return res.status(500).json({
         message: "Erro ao acessar o painel",
         error: error.message,
@@ -38,11 +41,13 @@ class ProtectedController {
    */
   static adminOnly(req, res) {
     try {
+      logger.info(`Acesso à área admin - User: ${req.user.email}`);
       return res.status(200).json({
         message: `Bem-vindo à área admin,
            ${req.user.email}`,
       });
     } catch (error) {
+      logger.error(`Erro ao acessar área admin - User: ${req.user.email}`, { stack: error.stack });
       return res.status(500).json({
         message: "Erro ao acessar a área admin",
         error: error.message,
@@ -65,12 +70,15 @@ class ProtectedController {
    */
   static async createEvent(req, res) {
     try {
+      logger.info(`Criando evento - Título: ${req.body.title}`);
       const event = await EventService.createEvent(req.body);
+      logger.info(`Evento criado com sucesso - ID: ${event.id}, Título: ${event.title}`);
       return res.status(201).json({
         message: "Evento criado com sucesso",
         event,
       });
     } catch (error) {
+      logger.error(`Erro ao criar evento - ${error.message}`, { stack: error.stack });
       return res.status(400).json({
         message: "Erro ao criar evento",
         error: error.message,
@@ -90,14 +98,17 @@ class ProtectedController {
   static async updateEvent(req, res) {
     try {
       const { id } = req.params;
+      logger.info(`Atualizando evento - ID: ${id}`);
 
       const event = await EventService.updateEvent(id, req.body);
+      logger.info(`Evento atualizado com sucesso - ID: ${id}`);
       return res.status(200).json({
         message: "Evento atualizado com sucesso",
         event,
       });
     } catch (error) {
       const statusCode = error.message === "Evento não encontrado" ? 404 : 400;
+      logger.error(`Erro ao atualizar evento - ID: ${req.params.id} - ${error.message}`);
       return res.status(statusCode).json({
         message: "Erro ao atualizar evento",
         error: error.message,
@@ -116,12 +127,15 @@ class ProtectedController {
   static async deleteEvent(req, res) {
     try {
       const { id } = req.params;
+      logger.info(`Excluindo evento - ID: ${id}`);
       await EventService.deleteEvent(id);
+      logger.info(`Evento excluído com sucesso - ID: ${id}`);
       return res.status(200).json({
         message: "Evento excluído com sucesso",
       });
     } catch (error) {
       const statusCode = error.message === "Evento não encontrado" ? 404 : 500;
+      logger.error(`Erro ao excluir evento - ID: ${req.params.id} - ${error.message}`);
       return res.status(statusCode).json({
         message: "Erro ao excluir evento",
         error: error.message,
@@ -141,12 +155,14 @@ class ProtectedController {
    */
   static async listVolunteers(req, res) {
     try {
+      logger.info("Listando voluntários");
       const volunteers = await VolunteerService.listVolunteers();
       return res.status(200).json({
         message: "Lista de voluntários",
         volunteers,
       });
     } catch (error) {
+      logger.error(`Erro ao listar voluntários - ${error.message}`, { stack: error.stack });
       return res.status(500).json({
         message: "Erro ao listar voluntários",
         error: error.message,
@@ -219,11 +235,13 @@ class ProtectedController {
       }
 
       const volunteer = await VolunteerService.createVolunteer(req.body);
+      logger.info(`Voluntário criado com sucesso - ID: ${volunteer.id}, Nome: ${volunteer.name}`);
       return res.status(201).json({
         message: "Voluntário criado com sucesso",
         volunteer,
       });
     } catch (error) {
+      logger.error(`Erro ao criar voluntário - ${error.message}`, { stack: error.stack });
       return res.status(500).json({
         message: "Erro ao criar voluntário",
         error: error.message,

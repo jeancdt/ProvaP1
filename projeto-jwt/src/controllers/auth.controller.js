@@ -1,4 +1,5 @@
 const UserService = require("../services/userService");
+const logger = require("../config/logger.config");
 
 /**
  * Controller de autenticação
@@ -17,9 +18,15 @@ class AuthController {
    */
   static async register(req, res) {
     try {
+      const { email, role } = req.body;
+      logger.info(`Tentativa de registro - Email: ${email}, Role: ${role}`);
+
       const result = await UserService.registerUser(req.body);
+
+      logger.info(`Usuário registrado com sucesso - Email: ${email}`);
       return res.status(201).json(result);
     } catch (error) {
+      logger.error(`Erro ao registrar usuário - Email: ${req.body.email} - ${error.message}`, { stack: error.stack });
       return res.status(409).json({ message: error.message });
     }
   }
@@ -35,10 +42,22 @@ class AuthController {
    */
   static async login(req, res) {
     try {
+      const { email } = req.body;
+      logger.info(`Tentativa de login - Email: ${email}`);
+
       const result = await UserService.loginUser(req.body);
+
+      logger.info(`Login realizado com sucesso - Email: ${email}`);
       return res.status(200).json(result);
     } catch (error) {
       const status = error.message === "Usuário não encontrado" || error.message === "Senha inválida" ? 401 : 500;
+
+      logger.warn(`Falha no login - Email: ${req.body.email} - Motivo: ${error.message}`);
+
+      if (status === 500) {
+        logger.error(`Erro interno no login - Email: ${req.body.email}`, { stack: error.stack });
+      }
+
       return res.status(status).json({ message: error.message });
     }
   }
