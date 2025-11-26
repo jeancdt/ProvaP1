@@ -1,54 +1,23 @@
-CONTEXTO:
-O IFRS deseja organizar ações de voluntariado (como campanhas de doação de sangue, arrecadação de alimentos e mutirões ambientais). Para isso, você foi contratado para desenvolver um sistema monolítico (back-end em Node.js/Express com banco MySQL e front-end em React) que permita gerenciar voluntários e eventos sociais.
+Boas Práticas e Documentação
+  Aplicar princípios de Clean Code (nomes claros, funções curtas, sem duplicação).
+  Aplicar princípios SOLID sempre que possível.
+  Compartilhar código com o professor no Github
+  Configurar ESLint e Prettier para manter o padrão de código.
+  No README, apresentar este monólito adequadamente.
 
-REQUISITOS TÉCNICOS:
-  1. Integração Básica entre Front-end e Back-end  
-    ● Implementar a rota GET /events que retorne a lista de eventos de voluntariado cadastrados. ✅
-    ● Criar no front-end a página /events para exibir os eventos disponíveis em uma lista. ✅
+Documentar a API com Swagger (OpenAPI) incluindo ao menos:
+  GET /events
+  POST /events
+  POST /auth/login
 
-  2. Autenticação e Autorização com JWT  
-    ● Implementar a rota POST /auth/login para autenticar usuários fictícios (ex.: admin@ifrs.edu.br / 123456). ✅
-    ● Gerar um token JWT em caso de sucesso, com payload { email, role }. ✅
-    ● Criar a rota protegida GET /dashboard, acessível apenas para usuários autenticados. ✅
-    ● Administradores (role = admin) devem ter acesso à rota POST /events para cadastrar novos eventos. ✅
-    ● No front-end:
-      ○ Criar um formulário de login que consome /auth/login. ✅
-      ○ Proteger as rotas /dashboard e /admin com base no token armazenado. ✅
+Documentar o código interno com JSDoc, explicando funções, classes e parâmetros das camadas Model, Service e Controller.
 
-  3. Arquitetura em Camadas e RESTful APIs  
-    ● Estruturar o back-end seguindo arquitetura em camadas: 
-      ○ Model: operações no banco de dados. ✅
-      ○ Service: regras de negócio (ex.: limite máximo de voluntários por evento). ✅
-      ○ Controller: recebe requisições e chama o service. ✅
-      ○ Routes: define os endpoints. ✅
-    ● Aplicar princípios REST no design das rotas (/events, /volunteers, /auth). ✅
-    ● No README, apresentar este monólito adequadamente.
+Implementar Testes e Logs
+  Criar testes unitários com uso do Jest com cenários de sucesso e erro
+  Criar testes de integração com uso do Jest e Supertest com cenários de sucesso e erro
+  Criar um teste de Ponta a Ponta com o Selenium sobre a funcionalidade de Login no sistema
+  Criar logs estruturados com o Winston
 
-  4. Boas Práticas e Documentação  
-    ● Aplicar princípios de Clean Code (nomes claros, funções curtas, sem duplicação). ✅
-    ● Aplicar princípios SOLID sempre que possível. ✅
-    ● Compartilhar código com o professor no Github. ✅
-    ● Configurar ESLint e Prettier para manter o padrão de código. ✅
-    ● Documentar a API com Swagger (OpenAPI) incluindo ao menos:
-      ○ GET /events 
-      ○ POST /events 
-      ○ POST /auth/login 
-    ● Documentar o código interno com JSDoc, explicando funções, classes e parâmetros das camadas Model, Service e Controller.
-
-ENTREGÁVEIS 
-    ● Código-fonte completo e link do repositório no github. ✅
-    ● Script do banco de dados MySQL com as tabelas contendo dados fictícios. ✅
-    ● Arquivo tests.rest (REST Client) com exemplos de requisições. ✅
-    ● Arquivo README.md com instruções de instalação e execução.
-    ● Link para o vídeo.
-
-APRESENTAÇÃO DA APLICAÇÃO: 
-    ● A apresentação da aplicação deve ser realizada presencialmente em sala de aula, diretamente ao professor, até a data final de entrega da prova.
-    ● Além disso, é obrigatório o envio de um vídeo explicativo sobre o funcionamento da aplicação.
-      ○ O vídeo deve ter no máximo 10 minutos de duração.
-      ○ O link para o vídeo (no YouTube, Google Drive, etc.) deve ser incluído em um arquivo de texto (.txt) e enviado junto com os demais arquivos no .zip.
-    ● O vídeo deve conter:
-      ○ Demonstração prática da aplicação em funcionamento;
-      ○ Explicação dos principais trechos do código-fonte;
-      ○ Orientações de uso (navegação, funcionalidades);
-      ○ Indicação clara de limitações ou funcionalidades não implementadas, caso existam — isso é importante para alinhar expectativas e justificar eventuais lacunas.
+Implementar o uso de ORM
+  Implementar o uso do ORM Prisma em sua aplicação
+  Implemente o uso de Seeds e Migrations
