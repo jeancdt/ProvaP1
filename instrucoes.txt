@@ -21,3 +21,9 @@ Implementar Testes e Logs
 Implementar o uso de ORM
   Implementar o uso do ORM Prisma em sua aplicação
   Implemente o uso de Seeds e Migrations
+
+
+npx prisma migrate dev
+npx prisma db seed
+npx prisma studio
+npx prisma generate
