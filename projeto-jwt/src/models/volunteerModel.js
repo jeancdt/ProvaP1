@@ -1,4 +1,4 @@
-const db = require("../config/database");
+const prisma = require("../config/prismaClient");
 
 /**
  * Model de voluntários
@@ -10,18 +10,20 @@ class VolunteerModel {
    * @returns {Promise<Array>} Lista de voluntários
    */
   static async findAll() {
-    const [rows] = await db.query("SELECT * FROM volunteers");
-    return rows;
+    const volunteers = await prisma.volunteer.findMany();
+    return volunteers;
   }
 
   /**
    * Busca um voluntário por ID
    * @param {number} id - ID
-   * @returns {Promise<Object|undefined>} Objeto do voluntário ou undefined se não encontrado
+   * @returns {Promise<Object|null>} Objeto do voluntário ou null se não encontrado
    */
   static async findById(id) {
-    const [rows] = await db.query("SELECT * FROM volunteers WHERE id = ?", [id]);
-    return rows[0];
+    const volunteer = await prisma.volunteer.findUnique({
+      where: { id: parseInt(id) },
+    });
+    return volunteer;
   }
 
   /**
@@ -34,12 +36,14 @@ class VolunteerModel {
    */
   static async create(volunteer) {
     const { name, phone, email } = volunteer;
-    const [result] = await db.query("INSERT INTO volunteers (name, phone, email) VALUES (?, ?, ?)", [
-      name,
-      phone,
-      email,
-    ]);
-    return { id: result.insertId, name, phone, email };
+    const createdVolunteer = await prisma.volunteer.create({
+      data: {
+        name,
+        phone,
+        email: email || null,
+      },
+    });
+    return createdVolunteer;
   }
 
   /**
@@ -53,13 +57,19 @@ class VolunteerModel {
    */
   static async update(id, volunteer) {
     const { name, phone, email } = volunteer;
-    const [result] = await db.query("UPDATE volunteers SET name = ?, phone = ?, email = ? WHERE id = ?", [
-      name,
-      phone,
-      email,
-      id,
-    ]);
-    return result.affectedRows > 0;
+    try {
+      await prisma.volunteer.update({
+        where: { id: parseInt(id) },
+        data: {
+          name,
+          phone,
+          email: email || null,
+        },
+      });
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 
   /**
@@ -68,8 +78,14 @@ class VolunteerModel {
    * @returns {Promise<boolean>} true se o voluntário foi excluído
    */
   static async delete(id) {
-    const [result] = await db.query("DELETE FROM volunteers WHERE id = ?", [id]);
-    return result.affectedRows > 0;
+    try {
+      await prisma.volunteer.delete({
+        where: { id: parseInt(id) },
+      });
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 }
 

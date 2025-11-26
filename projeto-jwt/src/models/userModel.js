@@ -1,4 +1,4 @@
-const db = require("../config/database");
+const prisma = require("../config/prismaClient");
 
 /**
  * Model de usuários
@@ -8,11 +8,13 @@ class UserModel {
   /**
    * Busca um usuário pelo email
    * @param {string} email - Email
-   * @returns {Promise<Object|undefined>} Objeto ou undefined se não encontrado
+   * @returns {Promise<Object|null>} Objeto ou null se não encontrado
    */
   static async findByEmail(email) {
-    const [rows] = await db.query("SELECT * FROM users WHERE email = ?", [email]);
-    return rows[0];
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+    return user;
   }
 
   /**
@@ -25,13 +27,15 @@ class UserModel {
    */
   static async create(user) {
     const { email, password, role } = user;
-    const [result] = await db.query("INSERT INTO users (email, password, role) VALUES (?, ?, ?)", [
-      email,
-      password,
-      role,
-    ]);
+    const createdUser = await prisma.user.create({
+      data: {
+        email,
+        password,
+        role,
+      },
+    });
 
-    return result.insertId;
+    return createdUser.id;
   }
 }
 

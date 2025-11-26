@@ -1,4 +1,4 @@
-const db = require("../config/database");
+const prisma = require("../config/prismaClient");
 
 /**
  * Model de eventos
@@ -11,22 +11,29 @@ class EventModel {
    * @returns {Promise<Array>} Lista de eventos com voluntários
    */
   static async findAll() {
-    const [events] = await db.query(
-      "SELECT id, title, description, location, start_date, end_date FROM events ORDER BY start_date ASC"
-    );
+    const events = await prisma.event.findMany({
+      orderBy: {
+        start_date: "asc",
+      },
+      include: {
+        volunteers: {
+          include: {
+            volunteer: true,
+          },
+        },
+      },
+    });
 
-    for (let event of events) {
-      const [volunteers] = await db.query(
-        `SELECT v.name 
-                FROM volunteers v 
-                INNER JOIN event_volunteers ev ON v.id = ev.volunteer_id 
-                WHERE ev.event_id = ?`,
-        [event.id]
-      );
-      event.volunteers = volunteers.map((v) => v.name).join(", ");
-    }
-
-    return events;
+    // Formatar os eventos para incluir os nomes dos voluntários como string
+    return events.map((event) => ({
+      id: event.id,
+      title: event.title,
+      description: event.description,
+      location: event.location,
+      start_date: event.start_date,
+      end_date: event.end_date,
+      volunteers: event.volunteers.map((ev) => ev.volunteer.name).join(", "),
+    }));
   }
 
   /**
@@ -36,29 +43,32 @@ class EventModel {
    * @returns {Promise<Object|null>} Objeto ou null se não encontrado
    */
   static async findById(id) {
-    const [events] = await db.query(
-      "SELECT id, title, description, location, start_date, end_date FROM events WHERE id = ?",
-      [id]
-    );
+    const event = await prisma.event.findUnique({
+      where: { id: parseInt(id) },
+      include: {
+        volunteers: {
+          include: {
+            volunteer: true,
+          },
+        },
+      },
+    });
 
-    if (events.length === 0) {
+    if (!event) {
       return null;
     }
 
-    const event = events[0];
-
-    const [volunteers] = await db.query(
-      `SELECT v.id, v.name 
-            FROM volunteers v 
-            INNER JOIN event_volunteers ev ON v.id = ev.volunteer_id 
-            WHERE ev.event_id = ?`,
-      [id]
-    );
-
-    event.volunteers = volunteers.map((v) => v.name).join(", ");
-    event.volunteer_ids = volunteers.map((v) => v.id);
-
-    return event;
+    // Formatar o evento incluindo os voluntários
+    return {
+      id: event.id,
+      title: event.title,
+      description: event.description,
+      location: event.location,
+      start_date: event.start_date,
+      end_date: event.end_date,
+      volunteers: event.volunteers.map((ev) => ev.volunteer.name).join(", "),
+      volunteer_ids: event.volunteers.map((ev) => ev.volunteer.id),
+    };
   }
 
   /**
@@ -76,19 +86,28 @@ class EventModel {
   static async create(eventData) {
     const { title, description, location, start_date, end_date, volunteer_ids } = eventData;
 
-    const [result] = await db.query(
-      "INSERT INTO events (title, description, location, start_date, end_date) VALUES (?, ?, ?, ?, ?)",
-      [title, description, location, start_date, end_date]
-    );
+    // Criar o evento com as associações de voluntários em uma transação
+    const event = await prisma.event.create({
+      data: {
+        title,
+        description,
+        location,
+        start_date: new Date(start_date),
+        end_date: end_date ? new Date(end_date) : null,
+        volunteers:
+          volunteer_ids && volunteer_ids.length > 0
+            ? {
+                create: volunteer_ids.map((volunteerId) => ({
+                  volunteer: {
+                    connect: { id: volunteerId },
+                  },
+                })),
+              }
+            : undefined,
+      },
+    });
 
-    const eventId = result.insertId;
-
-    if (volunteer_ids && volunteer_ids.length > 0) {
-      const values = volunteer_ids.map((volunteerId) => [eventId, volunteerId]);
-      await db.query("INSERT INTO event_volunteers (event_id, volunteer_id) VALUES ?", [values]);
-    }
-
-    return await this.findById(eventId);
+    return await this.findById(event.id);
   }
 
   /**
@@ -107,19 +126,38 @@ class EventModel {
   static async update(id, eventData) {
     const { title, description, location, start_date, end_date, volunteer_ids } = eventData;
 
-    await db.query(
-      "UPDATE events SET title = ?, description = ?, location = ?, start_date = ?, end_date = ? WHERE id = ?",
-      [title, description, location, start_date, end_date, id]
-    );
+    // Usar transação para garantir consistência
+    await prisma.$transaction(async (tx) => {
+      // Atualizar o evento
+      await tx.event.update({
+        where: { id: parseInt(id) },
+        data: {
+          title,
+          description,
+          location,
+          start_date: new Date(start_date),
+          end_date: end_date ? new Date(end_date) : null,
+        },
+      });
 
-    if (volunteer_ids !== undefined) {
-      await db.query("DELETE FROM event_volunteers WHERE event_id = ?", [id]);
+      // Se volunteer_ids foi fornecido, atualizar as associações
+      if (volunteer_ids !== undefined) {
+        // Remover todas as associações existentes
+        await tx.eventVolunteer.deleteMany({
+          where: { event_id: parseInt(id) },
+        });
 
-      if (volunteer_ids.length > 0) {
-        const values = volunteer_ids.map((volunteerId) => [id, volunteerId]);
-        await db.query("INSERT INTO event_volunteers (event_id, volunteer_id) VALUES ?", [values]);
+        // Criar novas associações
+        if (volunteer_ids.length > 0) {
+          await tx.eventVolunteer.createMany({
+            data: volunteer_ids.map((volunteerId) => ({
+              event_id: parseInt(id),
+              volunteer_id: volunteerId,
+            })),
+          });
+        }
       }
-    }
+    });
 
     return await this.findById(id);
   }
@@ -131,9 +169,14 @@ class EventModel {
    * @returns {Promise<boolean>} true se o evento foi excluído
    */
   static async delete(id) {
-    // DELETE CASCADE
-    const [result] = await db.query("DELETE FROM events WHERE id = ?", [id]);
-    return result.affectedRows > 0;
+    try {
+      await prisma.event.delete({
+        where: { id: parseInt(id) },
+      });
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 
   /**
@@ -146,8 +189,16 @@ class EventModel {
       return [];
     }
 
-    const placeholders = volunteerIds.map(() => "?").join(",");
-    const [volunteers] = await db.query(`SELECT id FROM volunteers WHERE id IN (${placeholders})`, volunteerIds);
+    const volunteers = await prisma.volunteer.findMany({
+      where: {
+        id: {
+          in: volunteerIds,
+        },
+      },
+      select: {
+        id: true,
+      },
+    });
 
     return volunteers.map((v) => v.id);
   }
