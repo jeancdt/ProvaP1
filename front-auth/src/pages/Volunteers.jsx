@@ -54,7 +54,9 @@ export default function Volunteers() {
                   <th style={{ border: "1px solid #000", padding: "0.5rem", textAlign: "center" }}>Telefone</th>
                   <th style={{ border: "1px solid #000", padding: "0.5rem", textAlign: "center" }}>Email</th>
                   <th style={{ border: "1px solid #000", padding: "0.5rem", textAlign: "center" }}>Data de Cadastro</th>
-                  <th style={{ border: "1px solid #000", padding: "0.5rem", textAlign: "center" }}>Ações</th>
+                  {user.role === "admin" && (
+                    <th style={{ border: "1px solid #000", padding: "0.5rem", textAlign: "center" }}>Ações</th>
+                  )}
                 </tr>
               </thead>
               <tbody>
@@ -85,7 +87,18 @@ export default function Volunteers() {
                           <Link to={`/volunteers/edit/${volunteer.id}`}>
                             <Button>Editar</Button>
                           </Link>
-                          <button style={{ backgroundColor: "red", color: "white", border: "none", padding: "0.5rem", borderRadius: "0.5rem" }} onClick={() => handleDelete(volunteer.id, volunteer.name)}>Excluir</button>
+                          <button
+                            style={{
+                              backgroundColor: "red",
+                              color: "white",
+                              border: "none",
+                              padding: "0.5rem",
+                              borderRadius: "0.5rem",
+                            }}
+                            onClick={() => handleDelete(volunteer.id, volunteer.name)}
+                          >
+                            Excluir
+                          </button>
                         </div>
                       </td>
                     )}
