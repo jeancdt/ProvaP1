@@ -1,5 +1,5 @@
-const { PrismaClient } = require("@prisma/client");
-const bcrypt = require("bcryptjs");
+import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
@@ -128,11 +128,13 @@ async function main() {
   console.log("Seed concluído com sucesso!");
 }
 
-try {
-  await main();
-} catch (e) {
-  console.error("Erro na seed:", e);
-  process.exit(1);
-} finally {
-  await prisma.$disconnect();
-}
+// Execução principal
+main()
+  .then(async () => {
+    await prisma.$disconnect();
+  })
+  .catch(async (e) => {
+    console.error("Erro na seed:", e);
+    await prisma.$disconnect();
+    process.exit(1);
+  });
