@@ -11,14 +11,13 @@ async function main() {
   await prisma.event.deleteMany();
   await prisma.volunteer.deleteMany();
   await prisma.user.deleteMany();
-
   console.log("Dados existentes limpos");
 
   // Criar usuários
   const hashedPasswordUser = await bcrypt.hash("senha123", 10);
   const hashedPasswordAdmin = await bcrypt.hash("admin123", 10);
 
-  const user = await prisma.user.create({
+  await prisma.user.create({
     data: {
       email: "usuario@ifrs.edu.br",
       password: hashedPasswordUser,
@@ -26,7 +25,7 @@ async function main() {
     },
   });
 
-  const admin = await prisma.user.create({
+  await prisma.user.create({
     data: {
       email: "admin@ifrs.edu.br",
       password: hashedPasswordAdmin,
@@ -112,7 +111,7 @@ async function main() {
 
   console.log("Voluntários criados");
 
-  // Criar associações entre eventos e voluntários
+  // Criar links entre eventos e voluntários
   await prisma.eventVolunteer.createMany({
     data: [
       { event_id: event1.id, volunteer_id: volunteer1.id },
@@ -129,11 +128,11 @@ async function main() {
   console.log("Seed concluído com sucesso!");
 }
 
-main()
-  .catch((e) => {
-    console.error("Erro na seed: ", e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+try {
+  await main();
+} catch (e) {
+  console.error("Erro na seed:", e);
+  process.exit(1);
+} finally {
+  await prisma.$disconnect();
+}
