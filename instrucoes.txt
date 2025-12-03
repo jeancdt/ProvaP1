@@ -29,3 +29,5 @@ npx prisma studio
 npx prisma generate
 
 npm run test:e2e
+npm run test:unit
+npm run test:integration
