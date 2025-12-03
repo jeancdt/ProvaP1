@@ -1,6 +1,6 @@
 # Sistema de Voluntariado IFRS
 
-Prova P1 - Desenvolvimento de Aplicações Corporativas
+Prova P1 e P2 - Desenvolvimento de Aplicações Corporativas
 
 ## Sobre o Projeto
 
