@@ -1,14 +1,9 @@
 const request = require("supertest");
 const app = require("../../app");
 
-/**
- * Testes Integração - Rota Pública - GET Eventos
- */
+// Testes Integração - Rota Pública - GET Eventos
 describe("GET /events - Integração", () => {
-  /**
-   * Sucesso: Listar todos os eventos
-   * Importante: Ter pelo menos um evento criado
-   */
+  // Sucesso: Listar todos os eventos
   test("Retorna lista de eventos com sucesso", async () => {
     const response = await request(app).get("/events").expect("Content-Type", /json/).expect(200);
 
@@ -26,9 +21,7 @@ describe("GET /events - Integração", () => {
     }
   });
 
-  /**
-   * Sucesso: Buscar evento por ID
-   */
+  // Sucesso: Buscar evento por ID
   test("Retorna evento específico por ID", async () => {
     const listResponse = await request(app).get("/events");
 
@@ -46,9 +39,7 @@ describe("GET /events - Integração", () => {
     }
   });
 
-  /**
-   * Erro: Evento não encontrado
-   */
+  // Erro: Evento não encontrado
   test("Retorna erro 404 quando evento não existe", async () => {
     const idInexistente = 99999;
 

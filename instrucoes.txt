@@ -23,9 +23,10 @@ Implementar o uso de ORM
   Implemente o uso de Seeds e Migrations
 
 
+npx prisma migrate reset
 npx prisma migrate dev
-npx prisma db seed
 npx prisma studio
+npx prisma db seed
 npx prisma generate
 
 npm run test:e2e
