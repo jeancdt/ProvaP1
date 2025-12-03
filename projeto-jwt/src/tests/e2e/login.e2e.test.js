@@ -4,20 +4,20 @@
  *
  * Este teste automatiza o navegador Chrome para verificar:
  * 1. Login bem-sucedido com credenciais válidas
- * 2. Login falhado com credenciais inválidas
+ * 2. Login sem sucesso com credenciais inválidas
  */
 
 const { Builder, By, until } = require("selenium-webdriver");
 const chrome = require("selenium-webdriver/chrome");
 
-// Importar chromedriver para garantir que está instalado e configurado
+// Importar chromedriver (garante que está instalado e configurado)
 require("chromedriver");
 
 // Configurações
 const FRONTEND_URL = "http://localhost:5173/login";
 const TIMEOUT = 10000;
 
-// Credenciais para teste
+// Credenciais
 const VALID_CREDENTIALS = {
   email: "usuario@ifrs.edu.br",
   password: "senha123",
@@ -43,10 +43,10 @@ async function waitForElement(driver, locator, timeout = TIMEOUT) {
 }
 
 /**
- * Teste 1: Login bem-sucedido
+ * Teste 1: Login deve ser bem-sucedido
  */
 async function testSuccessfulLogin() {
-  console.log("\nIniciando teste de login");
+  console.log("\nIniciando teste 1 de login");
   let driver;
 
   try {
@@ -69,14 +69,14 @@ async function testSuccessfulLogin() {
     await driver.wait(until.urlContains("/dashboard"), TIMEOUT);
     const currentUrl = await driver.getCurrentUrl();
     if (currentUrl.includes("/dashboard")) {
-      console.log("LOGIN BEM-SUCEDIDO: Usuário autenticado e redirecionado para o dashboard");
+      console.log("Login bem sucedido: autenticado e redirecionado para dashboard");
       return true;
     } else {
       console.error('Falha na URL');
       return false;
     }
   } catch (error) {
-    console.error("ERRO no teste de login bem-sucedido:");
+    console.error("Erro no teste 1 de login:");
     console.error("Mensagem:", error.message);
     console.error("Stack:", error.stack);
     return false;
@@ -88,10 +88,10 @@ async function testSuccessfulLogin() {
 }
 
 /**
- * Teste 2: Login com credenciais inválidas
+ * Teste 2: Login deve falhar
  */
 async function testFailedLogin() {
-  console.log("\nIniciando teste de login com credenciais inválidas");
+  console.log("\nIniciando teste 2 de login");
   let driver;
 
   try {
@@ -116,19 +116,20 @@ async function testFailedLogin() {
 
     if (errorMessages.length > 0) {
       const errorText = await errorMessages[0].getText();
+      console.log("errorText:", errorText);
     }
 
     const currentUrl = await driver.getCurrentUrl();
 
-    if (!currentUrl.includes("/dashboard")) {
+    if (currentUrl.includes("/dashboard")) {
+      console.error("Falha: redirecionado a dashboard com credenciais inválidas");
+      return false;
+    } else {
       console.log("Login falhou corretamente");
       return true;
-    } else {
-      console.error("Falha: Foi redirecionado para dashboard com credenciais inválidas");
-      return false;
     }
   } catch (error) {
-    console.error("Erro no teste de login com credenciais inválidas:");
+    console.error("Erro no teste 2 de login:");
     console.error("Mensagem:", error.message);
     console.error("Stack:", error.stack);
     return false;
@@ -140,7 +141,7 @@ async function testFailedLogin() {
 }
 
 async function runAllTests() {
-  console.log("INICIANDO TESTES E2E - FUNCIONALIDADE DE LOGIN");
+  console.log("INICIANDO TESTES E2E LOGIN");
 
   const results = {
     total: 0,
@@ -157,7 +158,7 @@ async function runAllTests() {
     results.failed++;
   }
 
-  // Executar Teste 2: Login com credenciais inválidas
+  // Executar Teste 2: Login sem sucesso
   results.total++;
   const test2Result = await testFailedLogin();
   if (test2Result) {
@@ -169,7 +170,7 @@ async function runAllTests() {
   console.log("\nRelatório final dos testes E2E:");
   console.log(`Total de testes: ${results.total}`);
   console.log(`Testes bem-sucedidos: ${results.passed}`);
-  console.log(`Testes falhados: ${results.failed}`);
+  console.log(`Testes não sucedidos: ${results.failed}`);
 
   process.exit(results.failed > 0 ? 1 : 0);
 }
