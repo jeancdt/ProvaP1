@@ -12,7 +12,7 @@ const protectedRoutes = require("./src/routes/protected.routes");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Configuração do CORS
+// Config CORS
 app.use(
   cors({
     origin: "http://localhost:5173",
@@ -25,7 +25,7 @@ app.use(logger.httpLogger);
 
 app.use(express.json());
 
-// --- Configuração do Swagger/OpenAPI ---
+// --- Config Swagger/OpenAPI ---
 const swaggerOptions = {
   definition: {
     openapi: "3.0.0",
@@ -59,7 +59,7 @@ const swaggerOptions = {
           required: ["email", "password"],
           properties: {
             email: { type: "string", format: "email", example: "usuario@ifrs.edu.br" },
-            password: { type: "string", format: "password", example: "123456" },
+            password: { type: "string", format: "password", example: "senha123" },
           },
         },
         AuthResponse: {
@@ -137,7 +137,6 @@ app.use("/", publicRoutes);
 app.use("/protected", protectedRoutes);
 
 app.listen(PORT, () => {
-  logger.info(`🚀 API rodando em http://localhost:${PORT}`);
-  logger.info(`📚 Documentação Swagger disponível em http://localhost:${PORT}/api-docs`);
-  logger.info(`Environment: ${process.env.NODE_ENV || "development"}`);
+  logger.info(`API em http://localhost:${PORT}`);
+  logger.info(`Doc Swagger em http://localhost:${PORT}/api-docs`);
 });
