@@ -7,17 +7,13 @@ jest.mock("../../models/userModel");
 jest.mock("bcryptjs");
 jest.mock("jsonwebtoken");
 
-/**
- * Testes Unitários - UserService
- */
+// Testes Unitários - UserService
 describe("UserService - loginUser", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  /**
-   * Sucesso: Login com credenciais válidas
-   */
+  // Sucesso: Login com credenciais válidas
   test("Realizar login", async () => {
     const mockUser = {
       id: 1,
@@ -52,9 +48,7 @@ describe("UserService - loginUser", () => {
     });
   });
 
-  /**
-   * Erro: Usuário não encontrado
-   */
+  // Erro: Usuário não encontrado
   test("Realizar erro de usuário não encontrado", async () => {
     const credentials = {
       email: "naoexiste@ifrs.edu.br",
@@ -68,9 +62,7 @@ describe("UserService - loginUser", () => {
     expect(bcrypt.compare).not.toHaveBeenCalled();
   });
 
-  /**
-   * Erro: Senha inválida
-   */
+  // Erro: Senha inválida
   test("Realizar erro de senha inválida", async () => {
     const mockUser = {
       id: 1,

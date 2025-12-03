@@ -1,14 +1,10 @@
 const request = require("supertest");
 const app = require("../../app");
 
-/**
- * Testes Integração - Rota de Autenticação - POST /auth/login
- */
+// Testes Integração - Rota de Autenticação - POST /auth/login
 describe("POST /auth/login - Integração", () => {
-  /**
-   * Sucesso: Login com credenciais válidas
-   * Importante: Ter pelo menos um usuário criado
-   */
+  // Sucesso: Login com credenciais válidas
+  // Importante: Ter pelo menos um usuário criado
   test("Fazer login e retornar token", async () => {
     const credentials = {
       email: "usuario@ifrs.edu.br",
@@ -27,9 +23,7 @@ describe("POST /auth/login - Integração", () => {
     expect(response.body.user.role).toBeDefined();
   });
 
-  /**
-   * Erro: Credenciais inválidas
-   */
+  // Erro: Credenciais inválidas
   test("Retornar erro 401 (senha inválida)", async () => {
     const credentials = {
       email: "usuario@ifrs.edu.br",
@@ -45,9 +39,7 @@ describe("POST /auth/login - Integração", () => {
     expect(response.body.message).toBe("Senha inválida");
   });
 
-  /**
-   * Erro: Usuário não existe
-   */
+  // Erro: Usuário não existe
   test("Retornar erro 401 (usuário não encontrado)", async () => {
     const credentials = {
       email: "naoexiste@ifrs.edu.br",

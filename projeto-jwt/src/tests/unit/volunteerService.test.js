@@ -3,9 +3,7 @@ const VolunteerModel = require("../../models/volunteerModel");
 
 jest.mock("../../models/volunteerModel");
 
-/**
- * Testes Unitários - VolunteerService
- */
+// Testes Unitários - VolunteerService
 describe("VolunteerService", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -13,10 +11,7 @@ describe("VolunteerService", () => {
 
   // Busca
   describe("getVolunteerById", () => {
-    /**
-     * Sucesso: Buscar voluntário por ID
-     * Importante: Ter o usuário criado
-     */
+    // Sucesso: Buscar voluntário por ID
     test("Buscar voluntário por ID", async () => {
       const mockVolunteer = {
         id: 1,
@@ -33,9 +28,7 @@ describe("VolunteerService", () => {
       expect(result).toEqual(mockVolunteer);
     });
 
-    /**
-     * Erro: Voluntário não encontrado
-     */
+    // Erro: Voluntário não encontrado
     test("Realizar erro de voluntário não encontrado", async () => {
       VolunteerModel.findById.mockResolvedValue(null);
 
@@ -46,9 +39,7 @@ describe("VolunteerService", () => {
 
   // Criação
   describe("createVolunteer", () => {
-    /**
-     * Sucesso: Criar voluntário
-     */
+    // Sucesso: Criar voluntário
     test("Realizar criação de voluntário", async () => {
       const volunteerData = {
         name: "Maria Santos",
@@ -70,9 +61,7 @@ describe("VolunteerService", () => {
       expect(result.id).toBe(2);
     });
 
-    /**
-     * Sucesso: Criar voluntário sem email (opcional)
-     */
+    // Sucesso: Criar voluntário sem email (opcional)
     test("Realizar criação de voluntário sem email", async () => {
       const volunteerData = {
         name: "Pedro Oliveira",
@@ -96,9 +85,7 @@ describe("VolunteerService", () => {
 
   // Atualização
   describe("updateVolunteer", () => {
-    /**
-     * Sucesso: Atualizar voluntário
-     */
+    // Sucesso: Atualizar voluntário
     test("Realizar atualização de voluntário", async () => {
       const volunteerData = {
         name: "João Silva Atualizado",
@@ -114,9 +101,7 @@ describe("VolunteerService", () => {
       expect(result).toEqual({ id: 1, ...volunteerData });
     });
 
-    /**
-     * Erro: Atualizar voluntário inexistente
-     */
+    // Erro: Atualizar voluntário inexistente
     test("Realizar erro de atualização de voluntário inexistente", async () => {
       const volunteerData = {
         name: "Teste",
@@ -132,9 +117,7 @@ describe("VolunteerService", () => {
 
   // Exclusão
   describe("deleteVolunteer", () => {
-    /**
-     * Sucesso: Excluir voluntário
-     */
+    // Sucesso: Excluir voluntário
     test("Realizar exclusão de voluntário", async () => {
       VolunteerModel.delete.mockResolvedValue(true);
 
@@ -144,9 +127,7 @@ describe("VolunteerService", () => {
       expect(result).toEqual({ message: "Voluntário excluído com sucesso" });
     });
 
-    /**
-     * Erro: Excluir voluntário inexistente
-     */
+    // Erro: Excluir voluntário inexistente
     test("Realizar erro de exclusão de voluntário inexistente", async () => {
       VolunteerModel.delete.mockResolvedValue(false);
 
@@ -157,9 +138,7 @@ describe("VolunteerService", () => {
 
   // Listagem
   describe("listVolunteers", () => {
-    /**
-     * Sucesso: Listar todos os voluntários
-     */
+    // Sucesso: Listar todos os voluntários
     test("Realizar listagem de voluntários", async () => {
       const mockVolunteers = [
         { id: 1, name: "João Silva", phone: "(54) 99999-9999" },
